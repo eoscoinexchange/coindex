@@ -1,0 +1,354 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scale=no">
+    <title>CoinDex</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../dist/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/dialog.css" rel="stylesheet">
+    <script src="js/jquery_2.1.0.min.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/tp.js"></script>
+    <script src="js/buffer.js"></script>
+    <script src="js/eos.min.js"></script>
+    <script src="js/mDialogMin.js"></script>
+    <style>
+        #actiondiv {
+            width: 100%;
+        }
+
+        #tablediv {
+            width: 100%;
+        }
+
+        table thead th {
+            text-align: center;
+        }
+
+        #tablediv table tbody td {
+       
+            width: 50px;
+            text-align: center;
+        }
+
+        #userselllisttablebody td {
+            text-align: center;
+        }
+
+        /* td:nth-child(1) {
+            text-align: center;
+        }
+
+        td:nth-child(2) {
+            text-align: center;
+        }
+
+        td:nth-child(3) {
+            text-align: center;
+        }
+
+        td:nth-child(4) {
+            text-align: center;
+        }
+
+        td:nth-child(5) {
+            text-align: center;
+        }
+
+        td:nth-child(6) {
+            text-align: center;
+        } */
+
+        #login {
+            float: right;
+        }
+
+        .form {
+            margin: 20px auto;
+        }
+
+        button {
+            background-color: #1E90FF;
+            color: aliceblue;
+        }
+
+        select {
+            -webkit-appearance: none;
+        }
+        
+        input {
+            height:50px;
+        }
+        
+        .coinnamefa {
+            display: inline-block;
+            top: 32px;
+            left: 286px;
+            position: relative;
+            color: #1E90FF;
+        }
+
+        .tpwalletlistfa {
+            display: inline-block;
+            top: 32px;
+            left: 286px;
+            position: relative;
+            color: #1E90FF;
+        }
+    </style>
+</head>
+
+<body style="overflow-x:hidden">
+    <div>
+        <a href="https://eoscoindex.cn">www.eoscoindex.cn</a>
+    </div>
+    <div hidden>
+        <nav id="headdiv" class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#example-navbar-collapse">
+                        <span class="sr-only">切换导航</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#" style="font-size: 23px;font-weight: bold;color:#1E90FF;font-family: 'Courier New', Courier, monospace;">
+                        CoinDex
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse" id="example-navbar-collapse">
+                    <ul id="mainul" class="nav navbar-nav nav-tabs">
+                        <!-- <li><a href="#actiondiv" data-toggle="tab" style="font-size: 19px;">卖</a></li> -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 19px;">
+                                买 <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" id="tokenul">
+                            </ul>
+                        </li>
+                        <li id="luli"><a href="#ludiv" data-toggle="tab" style="font-size: 19px;">撸</a></li>
+                        <li id="dealli"><a href="#deallistdiv" data-toggle="tab" style="font-size: 19px;">成交记录</a></li>
+                        <!-- <li><a href="#contactdiv" data-toggle="tab" style="font-size: 19px;">联系</a></li> -->
+                        <li><a href="#aboutdiv" data-toggle="tab" style="font-size: 19px;">关于</a></li>
+                    </ul>
+                    <div id="logindiv" class="navbar-form navbar-right" role="search">
+                        <button type="btn" class="btn btn-default" onclick="scatterLogin()" id="loginbtn" style="display: inline-block;">
+                            登录
+                        </button>
+                    </div>
+                    <ul id="userinfoul" class="nav navbar-nav nav-tabs navbar-right" hidden>
+                        <li class="dropdown">
+                            <a id="usernamea" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                username <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#userselllistdiv" data-toggle="tab" onclick="getuserselllist()">我的卖单</a></li>
+                                <li><a href="#" onclick="scatterloginout()">退出</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </nav>
+        <div class="tab-content">
+            <div id="actiondiv" class="tab-pane container-fluid">
+                <div id="actionselldiv" class="form row" style="width:300px;margin:20px auto;">
+                    <div style="border-bottom: 1px solid #1E90FF;">
+                        <i class="coinnamefa fa fa-sort-down fa-lg"></i>
+                        <select id="coinname" style="border:0;width:300px;height:50px;background-color:#ffffff;"
+                            onchange="sellcoinchange()">
+                        </select>
+                    </div>
+                    <div style="border-bottom: 1px solid #1E90FF;">
+                        <input id="sellcoincntid" type="text" style="border:0;text-align: left;width:300px;outline:none;"
+                            placeholder="请输入想出售或收回的ITECOIN数量" onchange="checksellcoin()">
+                        </input>
+                    </div>
+                    <div style="border-bottom: 1px solid #1E90FF;">
+                        <input id="coinpriceid" type="text" style="border:0;text-align: left;width:300px;outline:none;"
+                            placeholder="请输入出售单价，最小0.000001EOS" onchange="checkprice()">
+                        </input>
+                    </div>
+                    <div style="text-align: left;width:300px;margin:5px auto;">
+                        <p id="accounttoken">余额:</p>
+                    </div>
+                    <br />
+                    <button id="sellbtn" class="btn" onclick="sell()" style="text-align: center;width:300px;margin:10px auto;">
+                        卖
+                    </button>
+                    <br />
+                    <button id="gohomebtn" class="btn" onclick="gohome()" style="text-align: center;width:300px;margin:10px auto;">
+                        回到首页
+                    </button>
+                </div>
+            </div>
+            <div id="tablediv" class="tab-pane container-fluid active">
+                <div id="sellerlistid" class="form row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>卖家</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>币种</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sellertablebody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="actionbuydiv" class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <div style="border-bottom: 1px solid #1E90FF;">
+                        <input id="buycoincntid" type="text" style="border:0;text-align: left;width:300px;outline:none;"
+                            placeholder="请输入想购买的BT数量" onchange="checkbuycoin(this)" oninput="calbuyneedeos()">
+                        </input>
+                    </div>
+                    <div style="text-align: left;width:300px;margin:5px auto;">
+                        <p id="accounteos" style="float:left;display:inline;">需支付:0.0000 EOS</p>
+                        <p id="liquideos" style="float:right;display:inline;">余额:</p>
+                    </div>
+                    <br />
+                    <button id="buybtn" class="btn" onclick="buy()" style="text-align: center;width:300px;margin:10px auto;">
+                        买
+                    </button>
+                    <button id="gohomebtn" class="btn" onclick="gohome()" style="text-align: center;width:300px;margin:10px auto;">
+                        回到首页
+                    </button>
+                </div>
+            </div>
+            <div id="ludiv" class="tab-pane container-fluid">
+                <div id="tpwalletlistdiv" class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <div style="border-bottom: 1px solid #1E90FF;">
+                        <i class="tpwalletlistfa fa fa-sort-down fa-lg"></i>
+                        <select id="tpwalletlist" style="border:0;width:300px;height:50px;background-color:#ffffff;"
+                            onchange="tpwalletlistchange(this)">
+                        </select>
+                    </div>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;">
+                    <button id="luwizboxbtn" class="btn" onclick="luwizbox()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 2 WIZBOX
+                    </button>
+                    <p style="color:red;">获取WIZBOX.<a href="https://game.wizards.one">WIZBOX官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;">
+                    <button id="luteabtn" class="btn" onclick="lutea()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 200 TEA
+                    </button>
+                    <p style="color:red;">获取200TEA 消耗0.22k内存,全部转账出去后，可恢复0.11k内存.<a href="http://www.51jianzhanjun.cn">TEA官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;">
+                    <button id="luenbbtn" class="btn" onclick="luenb()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 1000 ENB 价值0.2EOS
+                    </button>
+                    <p style="color:red;">获取1000ENB 消耗0.22k内存,全部转账出去后，可恢复0.11k内存.</p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;">
+                    <button id="lucubebtn" class="btn" onclick="lucube()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 1000 CUBE
+                    </button>
+                    <p style="color:red;">获取1000CUBE 消耗0.5k内存, 请谨慎考虑.<a href="http://eoscube.site/?ref=eosgametoken">CUBE官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <button id="lushishicaibtn" class="btn" onclick="lushishicai()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 0.1 EOS
+                    </button>
+                    <p style="color:red;">首玩消耗3EOS，3%的概率会输掉3EOS，然后97%概率会赢3.1EOS，赚0.1EOS, 不消耗内存，请谨慎考虑！。<a href="https://eosplay.co/link/eosgametoken">EOSPLAY官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <button id="ludicebtn" class="btn" onclick="ludice()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 1000DICE
+                    </button>
+                    <p style="color:red;">首次撸可得到1000 dice。<a href="https://betdice.one/?ref=eosgametoken">BetDice官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <button id="lusevenbtn" class="btn" onclick="luseven()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 10000SEVEN
+                    </button>
+                    <p style="color:red;">首次撸可得到10000SEVEN，但需消耗0.22k内存。<a href="https://www.se7ens.io">SEVEN官网链接</a></p>
+                </div>
+                <div class="form row" style="width:300px;margin:20px auto;" hidden>
+                    <button id="lumevbtn" class="btn" onclick="lumev()" style="text-align: center;width:300px;margin:10px auto;">
+                        GET 100 MEV
+                    </button>
+                    <p style="color:red;">首次撸可得到100MEV，且不消耗内存。<a href="https://jacks.myeosvegas.com?ref=eosgametoken">MEV官网链接</a></p>
+                </div>
+            </div>
+            <div id="deallistdiv" class="tab-pane container-fluid">
+                <div style="float:left;display:inline;">
+                    <p id="totaldealasset"></p>
+                </div>
+                <div style="border-bottom: 0px solid #1E90FF;float:right;display:inline;" class="dropdown">
+                    <a id="coindealtype" href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 14px;color:#000000;height:20px;">
+                        全部<b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" id="coindealul">
+                    </ul>
+                </div>
+                <div id="deallistid" class="form row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>买家</th>
+                                <th>卖家</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deallistbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="userselllistdiv" class="tab-pane container-fluid">
+                <div class="form row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>卖家</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>币种</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userselllisttablebody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="contactdiv" class="tab-pane container-fluid">
+                <div class="form row" style="width:300px;margin:20px auto;">
+                    <img style="text-align: center;width:300px;margin:50px auto;" src="contactgroup20181006.jpeg" />
+                </div>
+            </div>
+            <div id="aboutdiv" class="tab-pane container-fluid">
+                <!-- <div class="form row" style="width:300px;">
+                    <img style="text-align: center;width:300px;" src="contactgroup20181006.jpeg" />
+                </div> -->
+                <div class="form row" style="width:100%;margin:50px auto;">
+                    <p><i>CoinDex</i>创立于2018年9月18日，是一个基于EOS的C2C去中心化智能合约交易平台，合约名为<i>cointotheeos</i>。</p>
+                    <p>在这里我们坚持公开、简单、透明的原则，人人都可在此挂单，追单，也可随时撤单或修改价格，合约上的任何交易数据都可通过区块链浏览器查询到，且合约目前不收取任何手续费。</p>
+                    <p>对于功能我们实行简单化，以买卖为核心，这里没有复杂的注册认证流程，只需有Scatter环境即可。</p>
+                    <p>在这里不存在信任问题，你想买的就是他人想卖的，在这里不会买到假币，对于上线的任何币种都将进行严格验证，让这一切都交给合约处理，大家可放心交易。</p>
+                    <p>对于合约开源问题，考虑到竞争对手，暂不开源，有任何问题建议或上币需求都可加入官方群里提出，我们会第一时间解决和给予支持。目前群人员已满100，请添加微信wy19911230，我们会邀请您入群。</p>
+                    <p>这一切都只是开始，努力让我们不平凡，相信CoinDex的明天会更好。</p>
+                    <p>有加盟合作或其它疑问请添加微信：wy19911230。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
